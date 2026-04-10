@@ -44,6 +44,17 @@ function HomePage() {
     setPage(0);
   }
 
+  const addToCart = (product: Product) => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const foundProduct = cart.find(cartProduct => cartProduct.product.id === product.id);
+    if (foundProduct) {
+      foundProduct.quantity++;
+    } else {
+      cart.push({product: product, quantity: 1});
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
   // translate: https://react.i18next.com/guides/quick-start
   return (
     <div>
@@ -89,6 +100,7 @@ function HomePage() {
       {products.map(product =>
         <div key={product.id}>
           {product.name} - {product.price}€
+          <button onClick={() => addToCart(product)}>Lisa ostukorvi</button>
         </div>
       )}
 
