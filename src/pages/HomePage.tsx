@@ -8,19 +8,27 @@ function HomePage() {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(3);
   const [sort, setSort] = useState("id,asc");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [activeCategoryId, setActiveCategoryId] = useState(0);
 
+  useEffect(() => {
+    fetch(import.meta.env.VITE_BACK_URL + "/categories")
+    .then(res => res.json())
+    .then(json => setCategories(json))
+  }, []);
 
   // http://localhost:8080/products?page=0&size=4&sort=price,asc
+  // http://localhost:8080/products?page=0&size=3&sort=id,desc&activeCategoryId=0
   useEffect(() => {
-    fetch(import.meta.env.VITE_BACK_URL + `/products?page=${page}&size=${size}&sort=${sort}`)
+    fetch(import.meta.env.VITE_BACK_URL + `/products?page=${page}&size=${size}&sort=${sort}&activeCategoryId=${activeCategoryId}`)
     .then(res => res.json())
     .then(json => {
       setProducts(json.content);
       setTotalElements(json.totalElements);
       setTotalPages(json.totalPages);
     })
-  }, [page, size, sort]);
-  
+  }, [page, size, sort, activeCategoryId]);
+
   const sizeHandler = (newSize: number) => {
     setSize(newSize);
     setPage(0);
@@ -28,6 +36,11 @@ function HomePage() {
 
   const sortHandler = (newSort: string) => {
     setSort(newSort);
+    setPage(0);
+  }
+
+  const activeCategoryHandler = (categoryId: number) => {
+    setActiveCategoryId(categoryId);
     setPage(0);
   }
 
@@ -54,6 +67,23 @@ function HomePage() {
       <button onClick={() => sortHandler("price,asc")}>Sorteeri hind kasvavalt</button>
       <button onClick={() => sortHandler("price,desc")}>Sorteeri hind kahanevalt</button>
       
+      <br /><br />
+
+      <button
+        style={activeCategoryId === 0 ? {fontWeight: "bold"}: undefined}
+        onClick={() => activeCategoryHandler(0)}
+      >
+        Kõik kategooriad
+      </button>
+
+      {categories.map(category =>
+        <button
+          style={activeCategoryId === category.id ? {fontWeight: "bold"}: undefined}
+          onClick={() => activeCategoryHandler(Number(category.id))}>
+          {category.name}
+        </button>  
+      )}
+
       <br /><br />
 
       {products.map(product =>
