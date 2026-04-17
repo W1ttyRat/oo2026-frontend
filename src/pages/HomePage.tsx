@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import type { Product } from "../models/Product";
+import type { OrderRow } from "../models/OrderRow";
 
 function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -45,8 +46,8 @@ function HomePage() {
   }
 
   const addToCart = (product: Product) => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const foundProduct = cart.find(cartProduct => cartProduct.product.id === product.id);
+    const cart: OrderRow[] = JSON.parse(localStorage.getItem("cart") || "[]");
+    const foundProduct = cart.find(orderRow => orderRow.product.id === product.id);
     if (foundProduct) {
       foundProduct.quantity++;
     } else {
